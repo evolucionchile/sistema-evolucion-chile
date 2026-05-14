@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema Evolución - Panel Principal</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { display: flex; height: 100vh; background-color: #f0f2f5; }
+        
+        /* Barra Lateral */
+        .sidebar { width: 260px; background-color: #1a202c; color: white; display: flex; flex-direction: column; padding: 20px; }
+        .sidebar h2 { margin-bottom: 30px; text-align: center; color: #63b3ed; font-size: 1.5rem; }
+        
+        /* Botones del Menú */
+        .menu-btn { 
+            background: none; border: none; color: #a0aec0; padding: 12px 15px; 
+            text-align: left; width: 100%; cursor: pointer; font-size: 16px; 
+            border-radius: 8px; margin-bottom: 5px; transition: 0.3s;
+        }
+        .menu-btn:hover { background-color: #2d3748; color: white; }
+        .active { background-color: #3182ce; color: white; }
+
+        /* Contenido Principal */
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        
+        /* Tarjetas de Acceso Rápido */
+        .grid-modulos { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .card-modulo { 
+            background: white; padding: 20px; border-radius: 12px; border-left: 5px solid #3182ce;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; cursor: pointer; transition: 0.2s;
+        }
+        .card-modulo:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .card-modulo h3 { color: #2d3748; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>SISTEMA EVOLUCIÓN CHILE</h2>
+        <button class="menu-btn active">🏠 Inicio</button>
+        <button class="menu-btn">👤 Pacientes</button>
+        <button class="menu-btn">🏢 Sedes</button>
+        <button class="menu-btn">💰 Finanzas</button>
+        <button class="menu-btn">📦 Stock</button>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Bienvenido al Panel de Control del Sistema Evolución Chile</h1>
+            <span id="fecha"></span>
+        </div>
+
+        <div class="grid-modulos">
+            <div class="card-modulo"><h3>➕ Ingresar Paciente</h3></div>
+            <div class="card-modulo"><h3>✏️ Modificar Paciente</h3></div>
+            <div class="card-modulo"><h3>🗑️ Eliminar Paciente</h3></div>
+            <div class="card-modulo"><h3>🔍 Ver Ficha</h3></div>
+            <div class="card-modulo"><h3>📍 Consultar Sedes</h3></div>
+            <div class="card-modulo"><h3>💵 Finanzas</h3></div>
+            <div class="card-modulo"><h3>🛒 Stock Mercadería</h3></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('fecha').innerText = new Date().toLocaleDateString();
+    </script>
+</body>
+</html>
