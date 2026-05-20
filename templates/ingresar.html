@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <meta charset="UTF-8">
+    <title>Ficha de Ingreso Integral - Evolución Chile</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f0f2f5; padding: 20px; }
+        .container { max-width: 1150px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2d3748; margin-bottom: 30px; font-weight: bold; }
+        .section { background: #ebf4ff; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #dee2e6; }
+        .section-title { color: #3182ce; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 15px; border-bottom: 2px solid #3182ce; padding-bottom: 5px; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .field { display: flex; flex-direction: column; }
+        label { font-size: 0.75rem; color: #4a5568; margin-bottom: 4px; font-weight: 700; }
+        input, select, textarea { padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 0.9rem; width: 100%; }
+        input[readonly] { background-color: #edf2f7; cursor: not-allowed; pointer-events: none; }
+        .btn-submit { background: #3182ce; color: white; border: none; padding: 20px; width: 100%; border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .btn-submit:hover { background: #2b6cb0; transform: scale(1.01); }
+        .is-invalid { border-color: #e53e3e !important; background-color: #fff5f5; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px;">
+            <h1 style="color: #2d3748; font-weight: bold; font-size: 1.8rem;">Ficha de Ingreso Integral</h1>
+            <button onclick="location.href='/'" style="background: #4a5568; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: 0.2s; text-transform: uppercase;" onmouseover="this.style.background='#2d3748'" onmouseout="this.style.background='#4a5568'">
+          ← Volver al Panel
+    </button>
+        </div>
+        <form id="formIngreso" action="/guardar_paciente" method="POST" enctype="multipart/form-data">
+            
+            <!-- DATOS DE GESTIÓN -->
+            <div class="section">
+                <div class="section-title">Datos de Gestión</div>
+                <div class="grid">
+                    <div class="field"><label>Sede</label>
+                        <select name="sede" id="selectSede" required>
+                            <option value="">SELECCIONE SEDE</option>
+                            <option value="SEDE 1">SEDE 1</option><option value="SEDE 2">SEDE 2</option>
+                            <option value="SEDE 3">SEDE 3</option><option value="SEDE 4">SEDE 4</option>
+                            <option value="SEDE 5">SEDE 5</option><option value="SEDE 6">SEDE 6</option>
+                        </select>
+                    </div>
+                    <div class="field"><label>Descripción Sede</label><input type="text" name="descripcion_sede" id="descSede" readonly tabindex="-1"></div>
+                    <div class="field"><label>Fecha Ingreso</label><input type="date" name="fecha_ingreso" required></div>
+                    <div class="field"><label>Etapa Actual</label>
+                        <select name="etapa">
+                            <option value="COMPROMISO" selected>COMPROMISO</option>
+                            <option value="GRUPO 4">GRUPO 4</option><option value="GRUPO 3">GRUPO 3</option>
+                            <option value="GRUPO 2">GRUPO 2</option><option value="GRUPO 1">GRUPO 1</option>
+                            <option value="NIVEL 1">NIVEL 1</option><option value="NIVEL 2">NIVEL 2</option>
+                            <option value="NIVEL 3">NIVEL 3</option><option value="NIVEL 4">NIVEL 4</option>
+                            <option value="REINSERCIÓN">REINSERCIÓN</option><option value="REEDUCADO">REEDUCADO</option>
+                            <option value="ABANDONO">ABANDONO</option><option value="EXPULSIÓN">EXPULSIÓN</option>
+                        </select>
+                    </div>
+                    <div class="field"><label>Activo (SI/NO)</label><select name="activo"><option value="SI">SI</option><option value="NO">NO</option></select></div>
+                    <div class="field" style="grid-column: span 2;"><label>Observación</label><input type="text" name="observacion"></div>
+                    <div class="field" style="grid-column: span 2;">
+                        <label>Valor Mensualidad ($)</label>
+                        <input type="number" name="valor_mensualidad" min="0" placeholder="Ej: 250000" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INFORMACIÓN DEL PACIENTE -->
+            <div class="section">
+                <div class="section-title">Información del Paciente</div>
+                <div class="grid">
+                    <div class="field"><label>Primer Nombre</label><input type="text" name="primer_nombre_paciente" id="p_nom" required></div>
+                    <div class="field"><label>Segundo Nombre</label><input type="text" name="segundo_nombre_paciente" id="s_nom"></div>
+                    <div class="field"><label>Primer Apellido</label><input type="text" name="primer_apellido_paciente" id="p_ape" required></div>
+                    <div class="field"><label>Segundo Apellido</label><input type="text" name="segundo_apellido_paciente" id="s_ape"></div>
+                    <div class="field" style="grid-column: span 2;"><label>Nombre Completo</label><input type="text" name="nombre_completo_paciente" id="nom_completo" readonly tabindex="-1"></div>
+                    <div class="field"><label>Tipo Doc.</label><select name="tipo_documento_paciente" id="tipoDoc"><option value="RUT">RUT</option><option value="PASAPORTE">PASAPORTE</option></select></div>
+                    <div class="field"><label>N° Documento</label><input type="text" name="numero_documento_paciente" id="numDoc" required placeholder="12345678-K"></div>
+                    
+                    <div class="field"><label>Sexo</label>
+                        <select name="sexo">
+                            <option value="MASCULINO">MASCULINO</option>
+                            <option value="FEMENINO">FEMENINO</option>
+                            <option value="OTRO">OTRO</option>
+                        </select>
+                    </div>
+                    <div class="field"><label>Fecha Nacimiento</label><input type="date" name="fecha_nacimiento"></div>
+                    <div class="field"><label>Ocupación</label><input type="text" name="ocupacion"></div>
+                    <div class="field"><label>Previsión Salud</label>
+                        <select name="prevision_salud">
+                            <option value="FONASA">FONASA</option>
+                            <option value="BANMÉDICA">BANMÉDICA</option>
+                            <option value="COLMENA">COLMENA</option>
+                            <option value="CONSALUD">CONSALUD</option>
+                            <option value="CRUZ BLANCA">CRUZ BLANCA</option>
+                            <option value="NUEVA MASVIDA">NUEVA MASVIDA</option>
+                            <option value="VIDA TRES">VIDA TRES</option>
+                        </select>
+                    </div>
+<!-- Añadir esto en Información del Paciente -->
+<div class="field">
+    <label>País</label>
+    <select name="pais_paciente" id="paisPaciente">
+        <option value="CHILE" selected>CHILE</option>
+        <option value="ARGENTINA">ARGENTINA</option>
+        <option value="PERÚ">PERÚ</option>
+        <option value="BOLIVIA">BOLIVIA</option>
+        <option value="VENEZUELA">VENEZUELA</option>
+        <option value="COLOMBIA">COLOMBIA</option>
+        <option value="OTRO">OTRO</option>
+    </select>
+</div>
+                    <div class="field" style="grid-column: span 2;"><label>Dirección Paciente</label><input type="text" name="direccion_paciente"></div>
+                    
+                    <div class="field"><label>Región</label><select name="region_paciente" id="regionPaciente"></select></div>
+                    <div class="field"><label>Comuna</label><select name="comuna_paciente" id="comunaPaciente"></select></div>
+                </div>
+            </div>
+
+            <!-- INFORMACIÓN APODERADO -->
+            <div class="section">
+                <div class="section-title">Información Apoderado</div>
+                <div class="grid">
+                    <div class="field"><label>Nombre Apoderado</label><input type="text" name="nombre_apoderado"></div>
+                    <div class="field"><label>Tipo Doc. Apoderado</label><select name="tipo_documento_apoderado" id="tipoDocApo"><option value="RUT">RUT</option><option value="PASAPORTE">PASAPORTE</option></select></div>
+                    <div class="field"><label>N° Documento Apo.</label><input type="text" name="numero_documento_apoderado" id="numDocApo" placeholder="12345678-K"></div>
+                    <div class="field"><label>Fono Apoderado</label><input type="text" name="fono_apoderado"></div>
+                    <!-- Añadir esto en Información del Paciente -->
+<div class="field">
+    <label>País Apoderado</label>
+    <select name="pais_apoderado" id="paisApoderado">
+        <option value="CHILE" selected>CHILE</option>
+        <option value="ARGENTINA">ARGENTINA</option>
+        <option value="PERÚ">PERÚ</option>
+        <option value="BOLIVIA">BOLIVIA</option>
+        <option value="VENEZUELA">VENEZUELA</option>
+        <option value="COLOMBIA">COLOMBIA</option>
+        <option value="OTRO">OTRO</option>
+    </select>
+</div>
+                    <div class="field" style="grid-column: span 2;"><label>Dirección Apoderado</label><input type="text" name="direccion_apoderado"></div>
+                    <div class="field"><label>Región Apoderado</label><select name="region_apoderado" id="regionApo"></select></div>
+                    <div class="field"><label>Comuna Apoderado</label><select name="comuna_apoderado" id="comunaApo"></select></div>
+                </div>
+            </div>
+
+            <!-- OTROS CONTACTOS -->
+            <div class="section">
+                <div class="section-title">Otros Contactos (Emergencia)</div>
+                <div class="grid">
+                    <div class="field"><label>Contacto 1</label><input type="text" name="nombre_contacto_1"></div>
+                    <div class="field"><label>Parentesco 1</label><input type="text" name="parentezco_contacto_1"></div>
+                    <div class="field"><label>Fono 1</label><input type="text" name="fono_contacto_1"></div>
+                    <div></div>
+                    <div class="field"><label>Contacto 2</label><input type="text" name="nombre_contacto_2"></div>
+                    <div class="field"><label>Parentesco 2</label><input type="text" name="parentezco_contacto_2"></div>
+                    <div class="field"><label>Fono 2</label><input type="text" name="fono_contacto_2"></div>
+                    <div></div>
+                    <div class="field"><label>Contacto 3</label><input type="text" name="nombre_contacto_3"></div>
+                    <div class="field"><label>Parentesco 3</label><input type="text" name="parentezco_contacto_3"></div>
+                    <div class="field"><label>Fono 3</label><input type="text" name="fono_contacto_3"></div>
+                    <div class="field"><label>Foto Cédula</label><input type="file" name="imagen_documento_identidad" accept="image/*"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">GUARDAR REGISTRO COMPLETO</button>
+        </form>
+    </div>
+
+    <script>
+        // --- CONFIGURACIÓN DE SEDES ---
+        const sedes = {"SEDE 1": "OLEA", "SEDE 2": "NALTAHUA", "SEDE 3": "POLPAICO", "SEDE 4": "FEMENINO 1", "SEDE 5": "SEDE 5", "SEDE 6": "SEDE 6"};
+        document.getElementById('selectSede').addEventListener('change', function() { 
+            document.getElementById('descSede').value = sedes[this.value] || ""; 
+        });
+
+        // --- CAPITALIZACIÓN Y NOMBRE COMPLETO ---
+        function formatProperCase(text) {
+            return text.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function actualizarNombre() {
+            const p_nom = formatProperCase(document.getElementById('p_nom').value);
+            const s_nom = formatProperCase(document.getElementById('s_nom').value);
+            const p_ape = formatProperCase(document.getElementById('p_ape').value);
+            const s_ape = formatProperCase(document.getElementById('s_ape').value);
+            
+            document.getElementById('p_nom').value = p_nom;
+            document.getElementById('s_nom').value = s_nom;
+            document.getElementById('p_ape').value = p_ape;
+            document.getElementById('s_ape').value = s_ape;
+
+            const completo = `${p_nom} ${s_nom} ${p_ape} ${s_ape}`.trim().replace(/\s+/g, ' ');
+            document.getElementById('nom_completo').value = completo;
+        }
+
+        document.querySelectorAll('#p_nom, #s_nom, #p_ape, #s_ape').forEach(i => {
+            i.addEventListener('blur', actualizarNombre);
+        });
+
+        document.querySelectorAll('input[type="text"]').forEach(input => {
+            if (!input.readOnly && !['numDoc', 'numDocApo'].includes(input.id)) {
+                input.addEventListener('blur', function() {
+                    this.value = formatProperCase(this.value);
+                });
+            }
+        });
+
+        // --- VALIDACIÓN DE RUT CHILENO ---
+        function validarRutChileno(rutCompleto) {
+            let valor = rutCompleto.replace(/\./g, '').replace(/-/g, '');
+            if (valor.length < 8) return false;
+            let cuerpo = valor.slice(0, -1);
+            let dv = valor.slice(-1).toUpperCase();
+            let suma = 0; let multiplo = 2;
+            for (let i = 1; i <= cuerpo.length; i++) {
+                suma = suma + (multiplo * valor.charAt(cuerpo.length - i));
+                if (multiplo < 7) multiplo = multiplo + 1; else multiplo = 2;
+            }
+            let dvEsperado = 11 - (suma % 11);
+            dvEsperado = (dvEsperado == 11) ? 0 : ((dvEsperado == 10) ? 'K' : dvEsperado);
+            return dv == dvEsperado;
+        }
+
+        function aplicarValidacionRUT(idInput, idTipo) {
+            const input = document.getElementById(idInput);
+            input.addEventListener('blur', function() {
+                if (document.getElementById(idTipo).value === "RUT" && this.value !== "") {
+                    let v = this.value.replace(/\./g, '').replace(/-/g, '').toUpperCase();
+                    if (v.length >= 8) {
+                        let cuerpo = v.slice(0, -1); let dv = v.slice(-1);
+                        this.value = cuerpo + '-' + dv;
+                        if (!validarRutChileno(this.value)) {
+                            alert("RUT Inválido. Por favor verifique.");
+                            this.classList.add('is-invalid');
+                            this.value = "";
+                        } else {
+                            this.classList.remove('is-invalid');
+                        }
+                    }
+                }
+            });
+        }
+        aplicarValidacionRUT('numDoc', 'tipoDoc'); 
+        aplicarValidacionRUT('numDocApo', 'tipoDocApo');
+
+        // --- BASE DE DATOS DE REGIONES Y COMUNAS CHILE ---
+        const regionesComunas = {
+            "ARICA Y PARINACOTA": ["ARICA", "CAMARONES", "PUTRE", "GENERAL LAGOS"],
+            "TARAPACÁ": ["IQUIQUE", "ALTO HOSPICIO", "POZO ALMONTE", "CAMIÑA", "COLCHANE", "HUARA", "PICA"],
+            "ANTOFAGASTA": ["ANTOFAGASTA", "MEJILLONES", "SIERRA GORDA", "TALTAL", "CALAMA", "OLLAGÜE", "SAN PEDRO DE ATACAMA", "TOCOPILLA", "MARÍA ELENA"],
+            "ATACAMA": ["COPIAPÓ", "CALDERA", "TIERRA AMARILLA", "CHAÑARAL", "DIEGO DE ALMAGRO", "VALLENAR", "ALTO DEL CARMEN", "FREIRINA", "HUASCO"],
+            "COQUIMBO": ["LA SERENA", "COQUIMBO", "ANDACOLLO", "LA HIGUERA", "PAIGUANO", "VICUÑA", "ILLAPEL", "CANELA", "LOS VILOS", "SALAMANCA", "OVALLE", "COMBARBALÁ", "MONTE PATRIA", "PUNITAQUI", "RÍO HURTADO"],
+            "VALPARAÍSO": ["VALPARAÍSO", "CASABLANCA", "CONCÓN", "JUAN FERNÁNDEZ", "PUCHUNCAVÍ", "QUINTERO", "VIÑA DEL MAR", "ISLA DE PASCUA", "LOS ANDES", "CALLE LARGA", "RINCONADA", "SAN ESTEBAN", "LA LIGUA", "CABILDO", "PAPUDO", "PETORCA", "ZAPALLAR", "QUILLOTA", "CALERA", "HIJUELAS", "LA CRUZ", "NOGALES", "SAN ANTONIO", "ALGARROBO", "CARTAGENA", "EL QUISCO", "EL TABO", "SANTO DOMINGO", "SAN FELIPE", "CATEMU", "LLAILLAY", "PANQUEHUE", "PUTAENDO", "SANTA MARÍA", "QUILPUÉ", "VILLA ALEMANA", "LIMACHE", "OLMUÉ"],
+            "METROPOLITANA": ["SANTIAGO", "CERRILLOS", "CERRO NAVIA", "CONCHALÍ", "EL BOSQUE", "ESTACIÓN CENTRAL", "HUECHURABA", "INDEPENDENCIA", "LA CISTERNA", "LA FLORIDA", "LA GRANJA", "LA PINTANA", "LA REINA", "LAS CONDES", "LO BARNECHEA", "LO ESPEJO", "LO PRADO", "MACUL", "MAIPÚ", "ÑUÑOA", "PEDRO AGUIRRE CERDA", "PEÑALOLÉN", "PROVIDENCIA", "PUDAHUEL", "QUILICURA", "QUINTA NORMAL", "RECOLETA", "RENCA", "SAN JOAQUÍN", "SAN MIGUEL", "SAN RAMÓN", "VITACURA", "PUENTE ALTO", "PIRQUE", "SAN JOSÉ DE MAIPO", "SAN BERNARDO", "CALERA DE TANGO", "BUIN", "PAINE", "MELIPILLA", "ALHUÉ", "CURACAVÍ", "MARÍA PINTO", "SAN PEDRO", "TALAGANTE", "EL MONTE", "ISLA DE MAIPO", "PADRE HURTADO", "PEÑAFLOR", "COLINA", "LAMPA", "TILTIL"],
+            "O'HIGGINS": ["RANCAGUA", "CODEGUA", "COINCO", "COLTAUCO", "DOÑIHUE", "GRANEROS", "LAS CABRAS", "MACHALÍ", "MALLOA", "MOSTAZAL", "OLIVAR", "PEUMO", "PICHIDEGUA", "QUINTA DE TILCOCO", "RENGO", "REQUÍNOA", "SAN VICENTE", "PICHILEMU", "LA ESTRELLA", "LITUECHE", "MARCHIHUE", "NAVIDAD", "PAREDONES", "SAN FERNANDO", "CHÉPICA", "CHIMBARONGO", "LOLOL", "NANCAGUA", "PALMILLA", "PERALILLO", "PLACILLA", "PUMANQUE", "SANTA CRUZ"],
+            "MAULE": ["TALCA", "CONSTITUCIÓN", "CUREPTO", "EMPEDRADO", "MAULE", "PELARCO", "PENCAHUE", "RÍO CLARO", "SAN CLEMENTE", "SAN RAFAEL", "CAUQUENES", "CHANCO", "PELLUHUE", "CURICÓ", "HUALAÑÉ", "LICANTÉN", "MOLINA", "RAUCO", "ROMERAL", "SAGRADA FAMILIA", "TENO", "VICHUQUÉN", "LINARES", "COLBÚN", "LONGAVÍ", "PARRAL", "RETIRO", "SAN JAVIER", "VILLA ALEGRE", "YERBAS BUENAS"],
+            "ÑUBLE": ["CHILLÁN", "CHILLÁN VIEJO", "BULNES", "COBQUECURA", "COELEMU", "COIHUECO", "EL CARMEN", "NINHUE", "ÑIQUÉN", "PEMUCO", "PINTO", "PORTEZUELO", "QUIRIHUE", "RÁNQUIL", "SAN CARLOS", "SAN FABIÁN", "SAN IGNACIO", "SAN NICOLÁS", "TREGUACO", "YUNGAY"],
+            "BIOBÍO": ["CONCEPCIÓN", "CORONEL", "CHIGUAYANTE", "FLORIDA", "HUALPÉN", "HUALQUI", "LOTA", "PENCO", "SAN PEDRO DE LA PAZ", "SANTA JUANA", "TALCAHUANO", "TOMÉ", "LEBU", "ARAUCO", "CAÑETE", "CONTULMO", "CURANILAHUE", "LOS ÁLAMOS", "TIRÚA", "LOS ÁNGELES", "ANTUCO", "CABRERO", "LAJA", "MULCHÉN", "NACIMIENTO", "NEGRETE", "QUILACO", "QUILLECO", "SAN ROSENDO", "SANTA BÁRBARA", "TUCAPEL", "YUMBEL", "ALTO BIOBÍO"],
+            "ARAUCANÍA": ["TEMUCO", "CARAHUE", "CUNCO", "CURARREHUE", "FREIRE", "GALVARINO", "GORBEA", "LAUTARO", "LONCOCHE", "MELIPEUCO", "NUEVA IMPERIAL", "PADRE LAS CASAS", "PERQUENCO", "PITRUFQUÉN", "PUCÓN", "SAAVEDRA", "TEODORO SCHMIDT", "TOLTÉN", "VILCÚN", "VILLARRICA", "CHOLCHOL", "ANGOL", "CURACAUTÍN", "ERCILLA", "LONQUIMAY", "LOS SAUCES", "LUMACO", "PURÉN", "RENAICO", "TRAIGUÉN", "VICTORIA"],
+            "LOS RÍOS": ["VALDIVIA", "CORRAL", "LANCO", "LOS LAGOS", "MÁFIL", "MARIQUINA", "PAILLACO", "PANGUIPULLI", "LA UNIÓN", "FUTRONO", "LAGO RANCO", "RÍO BUENO"],
+            "LOS LAGOS": ["PUERTO MONTT", "CALBUCO", "COCHAMÓ", "FRESIA", "FRUTILLAR", "LOS MUERMOS", "LLANQUIHUE", "MAULLÍN", "PUERTO VARAS", "CASTRO", "ANCUD", "CHONCHI", "CURACO DE VÉLEZ", "DALCAHUE", "PUQUELDÓN", "QUEILÉN", "QUELLÓN", "QUEMCHI", "QUINCHAO", "OSORNO", "PUERTO OCTAY", "PURRANQUE", "PUYEHUE", "RÍO NEGRO", "SAN JUAN DE LA COSTA", "SAN PABLO", "CHAITÉN", "FUTALEUFÚ", "HUALAIHUÉ", "PALENA"],
+            "AYSÉN": ["COYHAIQUE", "LAGO VERDE", "AISÉN", "CISNES", "GUAITECAS", "COCHRANE", "O'HIGGINS", "TORTEL", "CHILE CHICO", "RÍO IBÁÑEZ"],
+            "MAGALLANES": ["PUNTA ARENAS", "LAGUNA BLANCA", "RÍO VERDE", "SAN GREGORIO", "CABO DE HORNOS", "ANTÁRTICA", "PORVENIR", "PRIMAVERA", "TIMAUKEL", "NATALES", "TORRES DEL PAINE"]
+        };
+
+        function vincularListados(idRegion, idComuna) {
+            const rs = document.getElementById(idRegion);
+            const cs = document.getElementById(idComuna);
+            rs.options.add(new Option("SELECCIONE REGIÓN", ""));
+            Object.keys(regionesComunas).sort().forEach(r => rs.options.add(new Option(r, r)));
+            
+            rs.addEventListener('change', function() {
+                cs.innerHTML = "";
+                cs.options.add(new Option("SELECCIONE COMUNA", ""));
+                const comunas = regionesComunas[this.value] || [];
+                comunas.sort().forEach(c => cs.options.add(new Option(c, c)));
+            });
+        }
+        vincularListados('regionPaciente', 'comunaPaciente');
+        vincularListados('regionApo', 'comunaApo');
+
+// VALIDACIÓN DE RUT DUPLICADO AL SALIR DE LA CASILLA
+document.getElementById('numDoc').addEventListener('blur', async function() {
+    // Esperamos un milisegundo para que actúe tu función que pone el guion (-) automáticamente
+    setTimeout(async () => {
+        let rut = this.value.trim().toUpperCase();
+        if (rut.length < 8) return; // Si está incompleto, no hace nada
+
+        try {
+            // Llamamos a la ruta de Python que acabamos de crear
+            const respuesta = await fetch(`/verificar_rut/${rut}`);
+            const resultado = await respuesta.json();
+
+            if (resultado.existe) {
+                // Alerta bonita e inmediata
+                // Verifica que la llamada a Swal.fire tenga esta estructura limpia:
+                Swal.fire({
+                    title: 'RUT DUPLICADO',
+                    text: `El RUT ${rut} ya está registrado en el sistema. Por favor, verifícalo o modificalo en la Pestaña Modificar Paciente.`,
+                    icon: 'warning',
+                    confirmButtonColor: '#3182ce',
+                    confirmButtonText: 'CORREGIR'
+                });
+                // Limpiamos la casilla para obligar al usuario a corregirlo
+                this.value = "";
+            }
+        } catch (error) {
+            console.error("Error al verificar el RUT:", error);
+        }
+    }, 100);
+});      
+
+// CONFIRMACIÓN DE GUARDADO ANTES DE ENVIAR EL FORMULARIO
+document.getElementById('formIngreso').addEventListener('submit', function(evento) {
+    // 1. Frenamos el envío automático del formulario
+    evento.preventDefault(); 
+    
+    // 2. Lanzamos la ventana de confirmación Sí/No
+    Swal.fire({
+        title: '¿DESEA AGREGAR AL PACIENTE?',
+        text: "Asegúrate de que todos los datos ingresados sean correctos.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3182ce',
+        cancelButtonColor: '#718096',
+        confirmButtonText: 'SÍ, GUARDAR',
+        cancelButtonText: 'NO, REVISAR'
+    }).then((resultado) => {
+        // 3. Si el usuario hace clic en "SÍ, GUARDAR"
+        if (resultado.isConfirmed) {
+            // Mostramos el mensaje de éxito inmediato
+            Swal.fire({
+                title: '¡PACIENTE AGREGADO CORRECTAMENTE!',
+                icon: 'success',
+                confirmButtonColor: '#3182ce',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                // Enviamos el formulario físicamente para que Python procese el registro
+                document.getElementById('formIngreso').submit();
+            });
+        }
+        // Si el usuario hace clic en "NO", el código no hace nada, 
+        // manteniendo el formulario intacto con toda la información escrita.
+    });
+});
+
+    </script>
+</body>
+</html>

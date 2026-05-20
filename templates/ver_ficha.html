@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ver Ficha Completa - Evolución Chile</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f0f2f5; padding: 20px; }
+        .container { max-width: 1150px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2d3748; margin-bottom: 30px; }
+        .search-container { background: #ebf4ff; padding: 25px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #bee3f8; }
+        .search-box { display: flex; gap: 15px; }
+        .search-box input { flex: 1; padding: 12px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 1rem; text-transform: uppercase; }
+        .btn-buscar { background: #3182ce; color: white; border: none; padding: 0 30px; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+
+        .results-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 10px; overflow: hidden; display: none; }
+        .results-table th { background: #3182ce; color: white; padding: 15px; text-align: left; }
+        .results-table td { padding: 15px; border-bottom: 1px solid #edf2f7; cursor: pointer; }
+
+        #fichaMaestra { display: none; margin-top: 30px; }
+        .section { background: #f8fafc; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        .section-title { color: #3182ce; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 15px; border-bottom: 2px solid #3182ce; padding-bottom: 5px; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .field { display: flex; flex-direction: column; }
+        label { font-size: 0.75rem; color: #718096; margin-bottom: 4px; font-weight: 700; }
+        .data-val { padding: 10px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem; color: #2d3748; min-height: 40px; font-weight: 500; text-transform: uppercase; }
+        
+        /* Área de acción final para la cédula */
+        .action-area { display: flex; justify-content: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e2e8f0; }
+        .btn-cedula { background: #3182ce; color: white; border: none; padding: 14px 35px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; text-transform: uppercase; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn-cedula:hover { background: #2b6cb0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px;">
+            <h1 style="color: #2d3748; font-weight: bold; font-size: 1.8rem;">Ver Ficha de Paciente</h1>
+            <button onclick="location.href='/'" style="background: #4a5568; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: 0.2s; text-transform: uppercase;" onmouseover="this.style.background='#2d3748'" onmouseout="this.style.background='#4a5568'">
+                ← Volver al Panel
+            </button>
+        </div>
+
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="inputBusqueda" placeholder="BUSCAR POR RUT O NOMBRE...">
+                <button class="btn-buscar" onclick="buscarPacientes()">BUSCAR</button>
+            </div>
+            <table class="results-table" id="tablaResultados">
+                <thead><tr><th>SEDE</th><th>RUT</th><th>NOMBRE COMPLETO</th></tr></thead>
+                <tbody id="cuerpoResultados"></tbody>
+            </table>
+        </div>
+
+        <div id="fichaMaestra">
+            <div class="section">
+                <div class="section-title">Gestión y Estado</div>
+                <div class="grid">
+                    <div class="field"><label>Sede</label><div class="data-val" id="v_sede"></div></div>
+                    <div class="field"><label>Descripción Sede</label><div class="data-val" id="v_descripcion_sede"></div></div>
+                    <div class="field"><label>Fecha Ingreso</label><div class="data-val" id="v_fecha_ingreso"></div></div>
+                    <div class="field"><label>Etapa</label><div class="data-val" id="v_etapa"></div></div>
+                    <div class="field"><label>Activo</label><div class="data-val" id="v_activo"></div></div>
+                    <div class="field" style="grid-column: span 2;"><label>Observación</label><div class="data-val" id="v_observacion"></div></div>
+                    <div class="field" style="grid-column: span 2;"><label>Valor Mensualidad</label><div class="data-val" id="v_valor_mensualidad" style="font-weight: bold; color: #2b6cb0;"></div></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Información Básica del Paciente</div>
+                <div class="grid">
+                    <div class="field"><label>Primer Nombre</label><div class="data-val" id="v_primer_nombre_paciente"></div></div>
+                    <div class="field"><label>Segundo Nombre</label><div class="data-val" id="v_segundo_nombre_paciente"></div></div>
+                    <div class="field"><label>Primer Apellido</label><div class="data-val" id="v_primer_apellido_paciente"></div></div>
+                    <div class="field"><label>Segundo Apellido</label><div class="data-val" id="v_segundo_apellido_paciente"></div></div>
+                    <div class="field" style="grid-column: span 2;"><label>Nombre Completo</label><div class="data-val" id="v_nombre_completo_paciente"></div></div>
+                    <div class="field"><label>Tipo Documento</label><div class="data-val" id="v_tipo_documento_paciente"></div></div>
+                    <div class="field"><label>Número Documento (RUT)</label><div class="data-val" id="v_numero_documento_paciente"></div></div>
+                    <div class="field"><label>Sexo</label><div class="data-val" id="v_sexo"></div></div>
+                    <div class="field"><label>Fecha Nacimiento</label><div class="data-val" id="v_fecha_nacimiento"></div></div>
+                    <div class="field"><label>Ocupación</label><div class="data-val" id="v_ocupacion"></div></div>
+                    <div class="field"><label>Previsión Salud</label><div class="data-val" id="v_prevision_salud"></div></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Ubicación y Domicilio</div>
+                <div class="grid">
+                    <div class="field" style="grid-column: span 2;"><label>Dirección Paciente</label><div class="data-val" id="v_direccion_paciente"></div></div>
+                    <div class="field"><label>Región Paciente</label><div class="data-val" id="v_region_paciente"></div></div>
+                    <div class="field"><label>Comuna Paciente</label><div class="data-val" id="v_comuna_paciente"></div></div>
+                    <div class="field"><label>País Paciente</label><div class="data-val" id="v_pais_paciente"></div></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Salud y Psiquiatría</div>
+                <div class="grid">
+                    <div class="field"><label>Psiquiatría (SI/NO)</label><div class="data-val" id="v_psiquiatria"></div></div>
+                    <div class="field"><label>Nombre Psiquiatra</label><div class="data-val" id="v_nombre_psiquiatra"></div></div>
+                    <div class="field"><label>Fecha Término Receta</label><div class="data-val" id="v_fecha_termino_receta"></div></div>
+                    <div class="field"><label>Fecha Término Licencia</label><div class="data-val" id="v_fecha_termino_licencia"></div></div>
+                    <div class="field"><label>Próxima Atención</label><div class="data-val" id="v_proxima_atencion"></div></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Información del Apoderado</div>
+                <div class="grid">
+                    <div class="field" style="grid-column: span 2;"><label>Nombre Apoderado</label><div class="data-val" id="v_nombre_apoderado"></div></div>
+                    <div class="field"><label>Tipo Documento Apo.</label><div class="data-val" id="v_tipo_documento_apoderado"></div></div>
+                    <div class="field"><label>Número Documento Apo.</label><div class="data-val" id="v_numero_documento_apoderado"></div></div>
+                    <div class="field" style="grid-column: span 2;"><label>Dirección Apoderado</label><div class="data-val" id="v_direccion_apoderado"></div></div>
+                    <div class="field"><label>Comuna Apoderado</label><div class="data-val" id="v_comuna_apoderado"></div></div>
+                    <div class="field"><label>Región Apoderado</label><div class="data-val" id="v_region_apoderado"></div></div>
+                    <div class="field"><label>Fono Apoderado</label><div class="data-val" id="v_fono_apoderado"></div></div>
+                    <div class="field"><label>País Apoderado</label><div class="data-val" id="v_pais_apoderado"></div></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Contactos Adicionales de Emergencia</div>
+                <div class="grid">
+                    <div class="field"><label>Nombre Contacto 1</label><div class="data-val" id="v_nombre_contacto_1"></div></div>
+                    <div class="field"><label>Parentesco Contacto 1</label><div class="data-val" id="v_parentezco_contacto_1"></div></div>
+                    <div class="field" style="grid-column: span 2;"><label>Fono Contacto 1</label><div class="data-val" id="v_fono_contacto_1"></div></div>
+                    
+                    <div class="field"><label>Nombre Contacto 2</label><div class="data-val" id="v_nombre_contacto_2"></div></div>
+                    <div class="field"><label>Parentesco Contacto 2</label><div class="data-val" id="v_parentezco_contacto_2"></div></div>
+                    <div class="field" style="grid-column: span 2;"><label>Fono Contacto 2</label><div class="data-val" id="v_fono_contacto_2"></div></div>
+                    
+                    <div class="field"><label>Nombre Contacto 3</label><div class="data-val" id="v_nombre_contacto_3"></div></div>
+                    <div class="field"><label>Parentesco Contacto 3</label><div class="data-val" id="v_parentezco_contacto_3"></div></div>
+                    <div class="field" style="grid-column: span 2;"><label>Fono Contacto 3</label><div class="data-val" id="v_fono_contacto_3"></div></div>
+                </div>
+            </div>
+
+            <div class="action-area">
+                <button class="btn-cedula" id="btnVerCedula">Ver Cédula de Identidad</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function buscarPacientes() {
+            const q = document.getElementById('inputBusqueda').value;
+            const res = await fetch(`/buscar_pacientes?q=${q}`);
+            const data = await res.json();
+            const tabla = document.getElementById('tablaResultados');
+            const cuerpo = document.getElementById('cuerpoResultados');
+            cuerpo.innerHTML = "";
+            if(data.pacientes.length > 0) {
+                tabla.style.display = "table";
+                data.pacientes.forEach(p => {
+                    cuerpo.innerHTML += `<tr onclick="mostrarFicha(${p.id})"><td>${p.sede}</td><td>${p.numero_documento_paciente}</td><td>${p.nombre_completo_paciente}</td></tr>`;
+                });
+            }
+        }
+
+        async function mostrarFicha(id) {
+            const res = await fetch(`/obtener_paciente/${id}`);
+            const p = await res.json();
+            document.getElementById('fichaMaestra').style.display = "block";
+            document.getElementById('tablaResultados').style.display = "none";
+
+            // Listado completo mapeado uno a uno con las columnas de Supabase
+            const campos = [
+                'sede', 'descripcion_sede', 'fecha_ingreso', 'etapa', 'activo', 'observacion',
+                'primer_nombre_paciente', 'segundo_nombre_paciente', 'primer_apellido_paciente', 'segundo_apellido_paciente',
+                'nombre_completo_paciente', 'tipo_documento_paciente', 'numero_documento_paciente', 'sexo', 'fecha_nacimiento',
+                'ocupacion', 'prevision_salud', 'direccion_paciente', 'region_paciente', 'comuna_paciente', 'pais_paciente',
+                'psiquiatria', 'nombre_psiquiatra', 'fecha_termino_receta', 'fecha_termino_licencia', 'proxima_atencion',
+                'nombre_apoderado', 'tipo_documento_apoderado', 'numero_documento_apoderado', 'direccion_apoderado',
+                'pais_apoderado', 'comuna_apoderado', 'region_apoderado', 'fono_apoderado',
+                'nombre_contacto_1', 'parentezco_contacto_1', 'fono_contacto_1',
+                'nombre_contacto_2', 'parentezco_contacto_2', 'fono_contacto_2',
+                'nombre_contacto_3', 'parentezco_contacto_3', 'fono_contacto_3'
+            ];
+            
+            campos.forEach(c => {
+                const el = document.getElementById('v_' + c);
+                if(el) el.innerText = p[c] || '---';
+            });
+        }
+    </script>
+</body>
+</html>

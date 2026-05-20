@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Modificar Ficha de Paciente - Evolución Chile</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f0f2f5; padding: 20px; }
+        .container { max-width: 1250px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        .header-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; }
+        h1 { color: #2d3748; font-weight: bold; font-size: 1.8rem; }
+        .btn-volver { background: #4a5568; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: 0.2s; text-transform: uppercase; }
+
+        .search-container { background: #fff5f5; padding: 25px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #feb2b2; }
+        .search-box { display: flex; gap: 15px; }
+        .search-box input { flex: 1; padding: 12px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 1rem; text-transform: uppercase; }
+        .btn-buscar { background: #e53e3e; color: white; border: none; padding: 0 30px; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+
+        .results-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 10px; overflow: hidden; display: none; }
+        .results-table th { background: #e53e3e; color: white; padding: 15px; text-align: left; }
+        .results-table td { padding: 15px; border-bottom: 1px solid #edf2f7; cursor: pointer; }
+
+        #formEdicion { display: none; margin-top: 30px; }
+        .section { background: #f7fafc; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        .section-title { color: #2b6cb0; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 15px; border-bottom: 2px solid #2b6cb0; padding-bottom: 5px; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .field { display: flex; flex-direction: column; }
+        label { font-size: 0.75rem; color: #4a5568; margin-bottom: 4px; font-weight: 700; }
+        input, select { padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 0.9rem; text-transform: uppercase; }
+        input[readonly] { background-color: #edf2f7; color: #718096; cursor: not-allowed; }
+        
+        .btn-update { background: #38a169; color: white; border: none; padding: 20px; width: 100%; border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; text-transform: uppercase; }
+        .btn-update:hover { background: #2f855a; transform: scale(1.01); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-area">
+            <h1>Modificar Ficha de Paciente</h1>
+            <button class="btn-volver" onclick="location.href='/'">← Volver al Panel</button>
+        </div>
+
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="inputBusqueda" placeholder="BUSCAR POR RUT O NOMBRE PARA MODIFICAR...">
+                <button class="btn-buscar" onclick="buscarPacientes()">BUSCAR</button>
+            </div>
+            <table class="results-table" id="tablaResultados">
+                <thead><tr><th>SEDE</th><th>DOCUMENTO</th><th>NOMBRE COMPLETO</th></tr></thead>
+                <tbody id="cuerpoResultados"></tbody>
+            </table>
+        </div>
+
+        <form id="formEdicion">
+            <input type="hidden" id="paciente_id">
+
+            <div class="section">
+                <div class="section-title">Datos de Gestión</div>
+                <div class="grid">
+                    <div class="field"><label>Sede</label>
+                        <select name="sede" id="e_sede" required>
+                            <option value="">SELECCIONE SEDE</option>
+                            <option value="SEDE 1">SEDE 1</option>
+                            <option value="SEDE 2">SEDE 2</option>
+                            <option value="SEDE 3">SEDE 3</option>
+                            <option value="SEDE 4">SEDE 4</option>
+                            <option value="SEDE 5">SEDE 5</option>
+                            <option value="SEDE 6">SEDE 6</option>
+                        </select>
+                    </div>
+                    <div class="field"><label>Descripción Sede</label><input type="text" name="descripcion_sede" id="e_descripcion_sede" readonly tabindex="-1"></div>
+                    <div class="field"><label>Fecha Ingreso</label><input type="date" name="fecha_ingreso" id="e_fecha_ingreso"></div>
+                    <div class="field"><label>Etapa</label>
+                        <select name="etapa" id="e_etapa">
+                            <option value="COMPROMISO">COMPROMISO</option>
+                            <option value="GRUPO 4">GRUPO 4</option>
+                            <option value="GRUPO 3">GRUPO 3</option>
+                            <option value="GRUPO 2">GRUPO 2</option>
+                            <option value="GRUPO 1">GRUPO 1</option>
+                            <option value="NIVEL 1">NIVEL 1</option>
+                            <option value="NIVEL 2">NIVEL 2</option>
+                            <option value="NIVEL 3">NIVEL 3</option>
+                            <option value="NIVEL 4">NIVEL 4</option>
+                            <option value="REINSERCIÓN">REINSERCIÓN</option>
+                            <option value="REEDUCADO">REEDUCADO</option>
+                            <option value="ABANDONO">ABANDONO</option>
+                            <option value="EXPULSIÓN">EXPULSIÓN</option>
+                        </select>
+                    </div>
+                    <div class="field"><label>Activo</label><input type="text" name="activo" id="e_activo"></div>
+                    <div class="field"><label>Valor Mensualidad ($)</label><input type="number" name="valor_mensualidad" id="e_valor_mensualidad"></div>
+                    <div class="field" style="grid-column: span 2;"><label>Observación</label><input type="text" name="observacion" id="e_observacion"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Información del Paciente</div>
+                <div class="grid">
+                    <div class="field"><label>Nº Documento / RUT (Solo Lectura)</label><input type="text" name="numero_documento_paciente" id="e_numero_documento_paciente" readonly></div>
+                    <div class="field"><label>Tipo Documento</label><input type="text" name="tipo_documento_paciente" id="e_tipo_documento_paciente"></div>
+                    <div class="field" style="grid-column: span 2;"><label>Nombre Completo Paciente</label><input type="text" name="nombre_completo_paciente" id="e_nombre_completo_paciente"></div>
+                    
+                    <div class="field"><label>Primer Nombre</label><input type="text" name="primer_nombre_paciente" id="e_primer_nombre_paciente"></div>
+                    <div class="field"><label>Segundo Nombre</label><input type="text" name="segundo_nombre_paciente" id="e_segundo_nombre_paciente"></div>
+                    <div class="field"><label>Primer Apellido</label><input type="text" name="primer_apellido_paciente" id="e_primer_apellido_paciente"></div>
+                    <div class="field"><label>Segundo Apellido</label><input type="text" name="segundo_apellido_paciente" id="e_segundo_apellido_paciente"></div>
+                    
+                    <div class="field"><label>Fecha Nacimiento</label><input type="date" name="fecha_nacimiento" id="e_fecha_nacimiento"></div>
+                    <div class="field"><label>Sexo</label><input type="text" name="sexo" id="e_sexo"></div>
+                    <div class="field"><label>Ocupación</label><input type="text" name="ocupacion" id="e_ocupacion"></div>
+                    <div class="field"><label>Previsión Salud</label><input type="text" name="prevision_salud" id="e_prevision_salud"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Dirección y Ubicación del Paciente</div>
+                <div class="grid">
+                    <div class="field" style="grid-column: span 2;"><label>Dirección Paciente</label><input type="text" name="direccion_paciente" id="e_direccion_paciente"></div>
+                    <div class="field"><label>Comuna Paciente</label><input type="text" name="comuna_paciente" id="e_comuna_paciente"></div>
+                    <div class="field"><label>Región Paciente</label><input type="text" name="region_paciente" id="e_region_paciente"></div>
+                    <div class="field"><label>País Paciente</label><input type="text" name="pais_paciente" id="e_pais_paciente"></div>
+                    <div class="field" style="grid-column: span 3;"><label>Imagen Documento Identidad (URL)</label><input type="text" name="imagen_documento_identidad" id="e_imagen_documento_identidad"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Área de Psiquiatría y Atenciones</div>
+                <div class="grid">
+                    <div class="field"><label>Psiquiatría (SI/NO)</label><input type="text" name="psiquiatria" id="e_psiquiatria"></div>
+                    <div class="field"><label>Nombre Psiquiatra</label><input type="text" name="nombre_psiquiatra" id="e_nombre_psiquiatra"></div>
+                    <div class="field"><label>Fecha Término Receta</label><input type="date" name="fecha_termino_receta" id="e_fecha_termino_receta"></div>
+                    <div class="field"><label>Fecha Término Licencia</label><input type="date" name="fecha_termino_licencia" id="e_fecha_termino_licencia"></div>
+                    <div class="field"><label>Próxima Atención</label><input type="date" name="proxima_atencion" id="e_proxima_atencion"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Información del Apoderado / Tutor</div>
+                <div class="grid">
+                    <div class="field" style="grid-column: span 2;"><label>Nombre Apoderado</label><input type="text" name="nombre_apoderado" id="e_nombre_apoderado"></div>
+                    <div class="field"><label>Tipo Documento Apoderado</label><input type="text" name="tipo_documento_apoderado" id="e_tipo_documento_apoderado"></div>
+                    <div class="field"><label>Número Documento Apoderado</label><input type="text" name="numero_documento_apoderado" id="e_numero_documento_apoderado"></div>
+                    <div class="field" style="grid-column: span 2;"><label>Dirección Apoderado</label><input type="text" name="direccion_apoderado" id="e_direccion_apoderado"></div>
+                    <div class="field"><label>Comuna Apoderado</label><input type="text" name="comuna_apoderado" id="e_comuna_apoderado"></div>
+                    <div class="field"><label>Región Apoderado</label><input type="text" name="region_apoderado" id="e_region_apoderado"></div>
+                    <div class="field"><label>País Apoderado</label><input type="text" name="pais_apoderado" id="e_pais_apoderado"></div>
+                    <div class="field"><label>Fono Apoderado</label><input type="text" name="fono_apoderado" id="e_fono_apoderado"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Contactos de Emergencia Alternativos</div>
+                <div class="grid">
+                    <div class="field"><label>Nombre Contacto 1</label><input type="text" name="nombre_contacto_1" id="e_nombre_contacto_1"></div>
+                    <div class="field"><label>Parentesco Contacto 1</label><input type="text" name="parentezco_contacto_1" id="e_parentezco_contacto_1"></div>
+                    <div class="field" style="grid-column: span 2;"><label>Fono Contacto 1</label><input type="text" name="fono_contacto_1" id="e_fono_contacto_1"></div>
+                    
+                    <div class="field"><label>Nombre Contacto 2</label><input type="text" name="nombre_contacto_2" id="e_nombre_contacto_2"></div>
+                    <div class="field"><label>Parentesco Contacto 2</label><input type="text" name="parentezco_contacto_2" id="e_parentezco_contacto_2"></div>
+                    <div class="field" style="grid-column: span 2;"><label>Fono Contacto 2</label><input type="text" name="fono_contacto_2" id="e_fono_contacto_2"></div>
+                    
+                    <div class="field"><label>Nombre Contacto 3</label><input type="text" name="nombre_contacto_3" id="e_nombre_contacto_3"></div>
+                    <div class="field"><label>Parentesco Contacto 3</label><input type="text" name="parentezco_contacto_3" id="e_parentezco_contacto_3"></div>
+                    <div class="field" style="grid-column: span 2;"><label>Fono Contacto 3</label><input type="text" name="fono_contacto_3" id="e_fono_contacto_3"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-update">GUARDAR CAMBIOS EN FICHA</button>
+        </form>
+    </div>
+
+    <script>
+        async function buscarPacientes() {
+            const q = document.getElementById('inputBusqueda').value;
+            const res = await fetch(`/buscar_pacientes?q=${q}`);
+            const data = await res.json();
+            const tabla = document.getElementById('tablaResultados');
+            const cuerpo = document.getElementById('cuerpoResultados');
+            cuerpo.innerHTML = "";
+            if(data.pacientes.length > 0) {
+                tabla.style.display = "table";
+                data.pacientes.forEach(p => {
+                    cuerpo.innerHTML += `<tr onclick="cargarFormulario(${p.id})"><td>${p.sede || 'SIN GESTIÓN'}</td><td>${p.numero_documento_paciente}</td><td>${p.nombre_completo_paciente}</td></tr>`;
+                });
+            } else {
+                tabla.style.display = "none";
+                Swal.fire('Atención', 'No se encontraron registros coincidentes', 'info');
+            }
+        }
+        // PEGAR ESTO DENTRO DE LA ETIQUETA <script> PARA LA DESCRIPCIÓN AUTOMÁTICA
+const diccionarioSedes = {
+    "SEDE 1": "OLEA", 
+    "SEDE 2": "NALTAHUA", 
+    "SEDE 3": "POLPAICO", 
+    "SEDE 4": "FEMENINO 1", 
+    "SEDE 5": "SEDE 5", 
+    "SEDE 6": "SEDE 6"
+};
+
+document.getElementById('e_sede').addEventListener('change', function() { 
+    document.getElementById('e_descripcion_sede').value = diccionarioSedes[this.value] || ""; 
+});
+        async function cargarFormulario(id) {
+            const res = await fetch(`/obtener_paciente/${id}`);
+            const p = await res.json();
+            document.getElementById('paciente_id').value = id;
+            document.getElementById('formEdicion').style.display = "block";
+            document.getElementById('tablaResultados').style.display = "none";
+
+            // Listado maestro de tus 45 campos oficiales de la base de datos
+            const campos = [
+                'sede', 'descripcion_sede', 'fecha_ingreso', 'etapa', 'activo', 'observacion', 
+                'primer_nombre_paciente', 'segundo_nombre_paciente', 'primer_apellido_paciente', 'segundo_apellido_paciente', 
+                'nombre_completo_paciente', 'tipo_documento_paciente', 'numero_documento_paciente', 'sexo', 
+                'fecha_nacimiento', 'ocupacion', 'prevision_salud', 'direccion_paciente', 'region_paciente', 
+                'comuna_paciente', 'pais_paciente', 'psiquiatria', 'nombre_psiquiatra', 'fecha_termino_receta', 
+                'fecha_termino_licencia', 'proxima_atencion', 'nombre_apoderado', 'tipo_documento_apoderado', 
+                'numero_documento_apoderado', 'direccion_apoderado', 'pais_apoderado', 'comuna_apoderado', 
+                'region_apoderado', 'fono_apoderado', 'nombre_contacto_1', 'parentezco_contacto_1', 
+                'fono_contacto_1', 'nombre_contacto_2', 'parentezco_contacto_2', 'fono_contacto_2', 
+                'nombre_contacto_3', 'parentezco_contacto_3', 'fono_contacto_3', 'imagen_documento_identidad', 
+                'valor_mensualidad'
+            ];
+
+            campos.forEach(c => {
+                const el = document.getElementById('e_' + c);
+                if(el) {
+                    // Validamos si es un campo de fecha para formatear el texto YYYY-MM-DD adecuadamente
+                    const esFecha = ['fecha_ingreso', 'fecha_nacimiento', 'fecha_termino_receta', 'fecha_termino_licencia', 'proxima_atencion'].includes(c);
+                    if(esFecha && p[c]) {
+                        el.value = p[c].substring(0, 10);
+                    } else {
+                        // Si viene null o indefinido desde Supabase, limpia la casilla asignando una cadena vacía
+                        el.value = p[c] !== null && p[c] !== undefined ? p[c] : "";
+                    }
+                }
+            });
+        }
+
+        document.getElementById('formEdicion').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('paciente_id').value;
+            
+            Swal.fire({
+                title: '¿CONFIRMA LA ACTUALIZACIÓN?',
+                text: "Se sobrescribirán las casillas modificadas en la base de datos.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#38a169',
+                cancelButtonColor: '#718096',
+                confirmButtonText: 'SÍ, ACTUALIZAR',
+                cancelButtonText: 'CANCELAR'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData(this);
+                    fetch(`/actualizar_paciente/${id}`, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.success) {
+                            Swal.fire('¡ÉXITO!', 'Ficha actualizada correctamente.', 'success')
+                            .then(() => location.href = '/');
+                        } else {
+                            Swal.fire('ERROR', 'Ocurrió un inconveniente al actualizar: ' + data.error, 'error');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

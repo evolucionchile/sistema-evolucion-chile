@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema Evolución Chile</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { display: flex; height: 100vh; background-color: #f0f2f5; }
+        .sidebar { width: 260px; background-color: #1a202c; color: white; display: flex; flex-direction: column; padding: 20px; }
+        .sidebar h2 { margin-top: 20px; margin-bottom: 5px; text-align: center; color: #63b3ed; font-size: 1.4rem; line-height: 1.2; text-transform: uppercase; }
+        .modo-local { color: #4a5568; font-size: 0.7rem; text-align: center; margin-bottom: 30px; letter-spacing: 1px; }
+        .menu-btn { background: none; border: none; color: #a0aec0; padding: 12px 15px; text-align: left; width: 100%; cursor: pointer; font-size: 16px; border-radius: 8px; margin-bottom: 5px; transition: 0.3s; }
+        .active { background-color: #3182ce; color: white; }
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .header h1 { font-size: 1.8rem; color: #1a202c; font-weight: bold; }
+        .grid-modulos { display: flex; gap: 25px; flex-wrap: wrap; }
+        .card-modulo { background: white; padding: 35px 25px; border-radius: 15px; border-left: 6px solid #3182ce; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; cursor: pointer; transition: 0.2s; text-decoration: none; min-width: 240px; flex: 1; }
+        .card-modulo:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .card-modulo h3 { color: #4a5568; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 12px; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>SISTEMA EVOLUCIÓN CHILE</h2>
+        <p class="modo-local">MODO LOCAL ACTIVADO</p>
+        <button class="menu-btn active">🏠 Inicio</button>
+        <button class="menu-btn">👤 Pacientes</button>
+        <button class="menu-btn">🏢 Sedes</button>
+        <button class="menu-btn">💰 Finanzas</button>
+        <button class="menu-btn">📦 Stock</button>
+    </div>
+    <div class="main-content">
+        <div class="header">
+            <h1>Bienvenido al Panel de Control del Sistema Evolución Chile</h1>
+            <span style="color: #4a5568; font-size: 0.9rem;">13-05-2026</span>
+        </div>
+        <div class="grid-modulos">
+            <a href="/ingresar" class="card-modulo">
+                <h3><span style="color: #805ad5; font-size: 1.4rem;">+</span> Ingresar Paciente</h3>
+            </a>
+            
+            <a href="/modificar" class="card-modulo">
+                <h3><span style="color: #f6ad55; font-size: 1.2rem;">✏️</span> Modificar Paciente</h3>
+            </a>
+            
+            <a href="/eliminar" class="card-modulo">
+    <h3><span style="color: #a0aec0; font-size: 1.2rem;">🗑️</span> Eliminar Paciente</h3>
+</a>
+            
+            <a href="/ver_ficha" class="card-modulo">
+                <h3><span style="color: #63b3ed; font-size: 1.2rem;">🔍</span> Ver Ficha</h3>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

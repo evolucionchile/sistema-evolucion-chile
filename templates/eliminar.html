@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Eliminar Paciente - Evolución Chile</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f0f2f5; padding: 20px; }
+        .container { max-width: 1150px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        .header-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; }
+        h1 { color: #2d3748; font-weight: bold; font-size: 1.8rem; }
+        .btn-volver { background: #4a5568; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: 0.2s; text-transform: uppercase; }
+
+        .search-container { background: #f7fafc; padding: 25px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #e2e8f0; }
+        .search-box { display: flex; gap: 15px; }
+        .search-box input { flex: 1; padding: 12px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 1rem; text-transform: uppercase; }
+        .btn-buscar { background: #4a5568; color: white; border: none; padding: 0 30px; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+
+        .results-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 10px; overflow: hidden; display: none; }
+        .results-table th { background: #4a5568; color: white; padding: 15px; text-align: left; }
+        .results-table td { padding: 15px; border-bottom: 1px solid #edf2f7; vertical-align: middle; }
+        
+        .btn-eliminar-fila { background: #e53e3e; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; transition: 0.2s; }
+        .btn-eliminar-fila:hover { background: #c53030; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-area">
+            <h1>Eliminar Registro de Paciente</h1>
+            <button class="btn-volver" onclick="location.href='/'">← Volver al Panel</button>
+        </div>
+
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="inputBusqueda" placeholder="BUSCAR POR RUT O NOMBRE PARA ELIMINAR...">
+                <button class="btn-buscar" onclick="buscarPacientes()">BUSCAR</button>
+            </div>
+            <table class="results-table" id="tablaResultados">
+                <thead>
+                    <tr>
+                        <th>SEDE</th>
+                        <th>RUT</th>
+                        <th>NOMBRE COMPLETO</th>
+                        <th style="width: 150px; text-align: center;">ACCION</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpoResultados"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function buscarPacientes() {
+    const q = document.getElementById('inputBusqueda').value;
+    const res = await fetch(`/buscar_pacientes?q=${q}`);
+    const data = await res.json();
+    const tabla = document.getElementById('tablaResultados');
+    const cuerpo = document.getElementById('cuerpoResultados');
+    cuerpo.innerHTML = "";
+    
+    if(data.pacientes && data.pacientes.length > 0) {
+        tabla.style.display = "table";
+        data.pacientes.forEach(p => {
+            // CORRECCIÓN AQUÍ: Se utiliza p.id en lugar de p.id_paciente
+            cuerpo.innerHTML += `
+                <tr>
+                    <td>${p.sede || 'SIN GESTIÓN'}</td>
+                    <td>${p.numero_documento_paciente || 'SIN DOCUMENTO'}</td>
+                    <td>${p.nombre_completo_paciente || 'SIN NOMBRE'}</td>
+                    <td style="text-align: center;">
+                        <button class="btn-eliminar-fila" onclick="confirmarEliminacion(${p.id}, '${p.nombre_completo_paciente || ''}', '${p.numero_documento_paciente || ''}')">Eliminar</button>
+                    </td>
+                </tr>`;
+        });
+    } else {
+        tabla.style.display = "none";
+        Swal.fire('Atención', 'No se encontraron pacientes para eliminar', 'info');
+    }
+}
+
+        function confirmarEliminacion(id, nombre, rut) {
+            // Mensaje de advertencia crítico Sí/No
+            Swal.fire({
+                title: '¿ESTÁ COMPLETAMENTE SEGURO?',
+                text: `Vas a eliminar definitivamente a ${nombre} (RUT: ${rut}) del sistema. Esta acción no se puede deshacer.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e53e3e',
+                cancelButtonColor: '#718096',
+                confirmButtonText: 'SÍ, ELIMINAR',
+                cancelButtonText: 'CANCELAR'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, ejecutamos la llamada asíncrona a Python
+                    fetch(`/eliminar_paciente/${id}`, {
+                        method: 'DELETE'
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.success) {
+                            Swal.fire({
+                                title: '¡ELIMINADO!',
+                                text: 'El registro ha sido removido exitosamente de la base de datos.',
+                                icon: 'success',
+                                confirmButtonColor: '#3182ce'
+                            }).then(() => {
+                                // Refrescamos la búsqueda actual para verificar que ya no aparece
+                                buscarPacientes();
+                            });
+                        } else {
+                            Swal.fire('ERROR', 'No se pudo eliminar el registro: ' + data.error, 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>
